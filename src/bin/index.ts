@@ -22,8 +22,8 @@ const registerCommand = (commandMap: ICommand) => {
     const { description, command, action } = commandMap[commandKey]
 
     program
-      .description(description)
       .command(command)
+      .description(description)
       .action((value: any) => {
         action(value)
       })

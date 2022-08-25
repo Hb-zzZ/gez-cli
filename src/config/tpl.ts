@@ -1,7 +1,7 @@
 export interface ITpl {
   name: string
   desc: string
-  downloadUrl: string
+  downloadId: string
 }
 
 export interface ISYSTEM_TPL {
@@ -11,7 +11,7 @@ export interface ISYSTEM_TPL {
 const SYSTEM_TPL: ISYSTEM_TPL = {
   pc: {
     name: 'pc',
-    downloadUrl: 'https://git.code.tencent.com/Hb-zzZ/gez-template-pc',
+    downloadId: '222444',
     desc: 'pc端模版 element-ui vue@2.0'
   }
 }

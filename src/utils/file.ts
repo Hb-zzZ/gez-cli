@@ -3,9 +3,9 @@ import os from 'os'
 import { logError, logSuccess, logInfo } from '@/utils/log'
 
 // 定义存放文件夹
-export const CACHE_DIR: string = 'GEZ_CACHE'
+export const FILE_DIR: string = '.gez'
 
-interface ILoadFile {
+interface IReadFile {
   path: string
   system?: boolean
 }
@@ -17,12 +17,12 @@ interface IExistsFile {
 
 interface IWriteFile {
   path: string
-  file?: string
+  file?: object
   system?: boolean
 }
 
-export const loadFile = <T = {}>({ path = '', system = true }: ILoadFile): T | false | undefined => {
-  const rePath = system ? `${os.homedir()}/${CACHE_DIR}/${path}` : path
+export const readFile = <T = {}>({ path = '', system = true }: IReadFile): T | false => {
+  const rePath = system ? `${os.homedir()}/${FILE_DIR}/${path}` : path
 
   try {
     if (!fs.pathExistsSync(rePath)) {
@@ -32,20 +32,20 @@ export const loadFile = <T = {}>({ path = '', system = true }: ILoadFile): T | f
     return data
   } catch (err) {
     logError(`读取错误: ${rePath}`)
+    return false
   }
 }
 
 export const existsFile = ({ path = '', system = true }: IExistsFile) => {
-  const rePath = system ? `${os.homedir()}/${CACHE_DIR}/${path}` : path
+  const rePath = system ? `${os.homedir()}/${FILE_DIR}/${path}` : path
   return fs.pathExistsSync(rePath)
 }
 
 export const writeFile = ({ path = '', file, system = true }: IWriteFile) => {
-  const rePath = system ? `${os.homedir()}/${CACHE_DIR}/${path}` : path
+  const rePath = system ? `${os.homedir()}/${FILE_DIR}/${path}` : path
   logInfo(rePath)
   try {
     fs.outputJsonSync(`${rePath}`, file)
-    logSuccess(`写入文件成功`)
   } catch (err) {
     logError(`写入错误: ${err}`)
   }
