@@ -9,6 +9,11 @@ export interface ISYSTEM_TPL {
 }
 
 const SYSTEM_TPL: ISYSTEM_TPL = {
+  control: {
+    name: 'control',
+    downloadId: '223881',
+    desc: 'gez-template控制器'
+  },
   pc: {
     name: 'pc',
     downloadId: '222444',

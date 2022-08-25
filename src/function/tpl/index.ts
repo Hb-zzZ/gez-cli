@@ -1,6 +1,7 @@
 import { logError, logSuccess } from '@/utils/log'
 import { downloadGit } from '@/utils/git'
 import { writeFile, readFile } from '@/utils/file'
+import { checkControl } from '@/utils/tpl'
 import { getTpl, ITpl } from '@/config/tpl'
 import childProcess from 'child_process'
 import prompts from 'prompts'
@@ -64,11 +65,17 @@ export const selectTpl = async () => {
         const result = (await getTplList(answer)) as ITpl[] | undefined
 
         if (result) {
-          Promise.all(
-            result.map(({ downloadId, name }) => downloadGit({ downloadId, TOKEN: gitConfig.TOKEN, path: name }))
-          ).then(() => {
-            logSuccess(`模版${result.map(({ name }) => name)}下载成功`)
-          })
+          checkControl(gitConfig.TOKEN)
+            .then(() =>
+              Promise.all(
+                result.map(({ downloadId, name }) =>
+                  downloadGit({ downloadId, TOKEN: gitConfig.TOKEN, path: `packages/${name}` })
+                )
+              )
+            )
+            .then(() => {
+              logSuccess(`模版${result.map(({ name }) => name)}下载成功`)
+            })
         } else {
           logError(`获取模版错误`)
         }
