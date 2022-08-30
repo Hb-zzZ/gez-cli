@@ -1,32 +1,132 @@
 import chalk from 'chalk'
+import ora from 'ora'
 
-// 计时日志
-export const logTiming = (str: string = '', start: boolean = true) => {
-  if (start) {
-    console.time('Timing')
-    console.log(chalk.cyan(`****** ${str} START ******`))
+const spinner = ora({
+  color: 'magenta',
+  spinner: {
+    interval: 45,
+    frames: [
+      '██████▁▁▁▁▁▁▁▁▁▁▁▁▁▁',
+      '▁██████▁▁▁▁▁▁▁▁▁▁▁▁▁',
+      '▁▁██████▁▁▁▁▁▁▁▁▁▁▁▁',
+      '▁▁▁██████▁▁▁▁▁▁▁▁▁▁▁',
+      '▁▁▁▁██████▁▁▁▁▁▁▁▁▁▁',
+      '▁▁▁▁▁██████▁▁▁▁▁▁▁▁▁',
+      '▁▁▁▁▁▁██████▁▁▁▁▁▁▁▁',
+      '▁▁▁▁▁▁▁██████▁▁▁▁▁▁▁',
+      '▁▁▁▁▁▁▁▁██████▁▁▁▁▁▁',
+      '▁▁▁▁▁▁▁▁▁██████▁▁▁▁▁',
+      '▁▁▁▁▁▁▁▁▁▁██████▁▁▁▁',
+      '▁▁▁▁▁▁▁▁▁▁▁██████▁▁▁',
+      '▁▁▁▁▁▁▁▁▁▁▁▁██████▁▁',
+      '▁▁▁▁▁▁▁▁▁▁▁▁▁██████▁',
+      '▁▁▁▁▁▁▁▁▁▁▁▁▁▁██████',
+      '█▁▁▁▁▁▁▁▁▁▁▁▁▁▁█████',
+      '██▁▁▁▁▁▁▁▁▁▁▁▁▁▁████',
+      '███▁▁▁▁▁▁▁▁▁▁▁▁▁▁███',
+      '████▁▁▁▁▁▁▁▁▁▁▁▁▁▁██',
+      '█████▁▁▁▁▁▁▁▁▁▁▁▁▁▁█'
+    ]
+  }
+})
+
+let spinnerLoading = false
+
+const logFn = (type: string, str: string | unknown) => {
+  const logFilter: {
+    [propName: string]: Function
+  } = {
+    info: getLogInfo,
+    warning: getLogWarring,
+    success: getLogSuccess,
+    error: getLogError
+  }
+
+  const getLogFn = logFilter[type]
+
+  if (spinnerLoading) {
+    spinner.text += getLogFn(str)
   } else {
-    console.log(chalk.cyan(`****** ${str} END ******`))
-    console.timeEnd('Timing')
+    // 没有loading，正常输出
+    console.log(getLogFn(str))
+  }
+}
+
+// loading动画（搭配下面log系列使用）
+export const logLoading = ({
+  start = true,
+  str = ''
+}: {
+  // 是否开启loading
+  start?: boolean
+  str?: string
+} = {}) => {
+  if (start) {
+    spinnerLoading = true
+    spinner.text = '\n\n' + chalk.cyan(str)
+    spinner.start()
+  } else {
+    spinnerLoading = false
+    // 删除一个回车符，保持高度一致
+    spinner.text = spinner.text.slice(1)
+    spinner.stopAndPersist({ text: str, prefixText: chalk.magenta(`******  DONE ******`) + `\n` })
+    spinner.text = ''
   }
 }
 
 // 普通日志
 export const logInfo = (str: string = '') => {
-  console.log(chalk.green(`[INFO]： ${str}`))
+  logFn('info', str)
 }
 
 // 警告日志
 export const logWarring = (str: string = '') => {
-  console.log(chalk.yellowBright(`[WARRING]： ${str}`))
+  logFn('warning', str)
 }
 
 // 成功日志
 export const logSuccess = (str: string = '') => {
-  console.log(chalk.greenBright(`[SUCCESS]： ${str}`))
+  logFn('success', str)
 }
 
 // 报错日志
 export const logError = (str: string | unknown = '') => {
-  console.log(chalk.redBright(`[ERROR]： ${str}`))
+  logFn('error', str)
+}
+
+// 普通日志
+export const getLogInfo = (str: string = '') => {
+  return chalk.cyan(`[INFO]： ${str}`)
+}
+
+// 警告日志
+export const getLogWarring = (str: string = '') => {
+  return chalk.yellow(`[WARRING]： ${str}`)
+}
+
+// 成功日志
+export const getLogSuccess = (str: string = '') => {
+  return chalk.green(`[SUCCESS]： ${str}`)
+}
+
+// 报错日志
+export const getLogError = (str: string | unknown = '') => {
+  return chalk.red(`[ERROR]： ${str}`)
+}
+
+// 计时日志
+export const logTiming = ({
+  start = true,
+  str = ''
+}: {
+  start?: boolean
+  str?: string
+} = {}) => {
+  if (start) {
+    console.time('Timing')
+    console.log(chalk.magenta(`****** ${str} START ******`))
+  } else {
+    console.log(chalk.magenta(`****** ${str} END ******`))
+    console.timeEnd('Timing')
+  }
 }
