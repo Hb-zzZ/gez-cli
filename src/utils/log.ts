@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import kleur from 'kleur'
 import ora from 'ora'
 
 const spinner = ora({
@@ -63,13 +63,13 @@ export const logLoading = ({
 } = {}) => {
   if (start) {
     spinnerLoading = true
-    spinner.text = '\n\n' + chalk.cyan(str)
+    spinner.text = '\n\n' + kleur.cyan(str)
     spinner.start()
   } else {
     spinnerLoading = false
     // 删除一个回车符，保持高度一致
     spinner.text = spinner.text.slice(1)
-    spinner.stopAndPersist({ text: str, prefixText: chalk.magenta(`******  DONE ******`) + `\n` })
+    spinner.stopAndPersist({ text: str, prefixText: kleur.magenta(`******  DONE ******`) + `\n` })
     spinner.text = ''
   }
 }
@@ -96,22 +96,22 @@ export const logError = (str: string | unknown = '') => {
 
 // 普通日志
 export const getLogInfo = (str: string = '') => {
-  return chalk.cyan(`[INFO]： ${str}`)
+  return kleur.cyan(`[INFO]： ${str}`)
 }
 
 // 警告日志
 export const getLogWarring = (str: string = '') => {
-  return chalk.yellow(`[WARRING]： ${str}`)
+  return kleur.yellow(`[WARRING]： ${str}`)
 }
 
 // 成功日志
 export const getLogSuccess = (str: string = '') => {
-  return chalk.green(`[SUCCESS]： ${str}`)
+  return kleur.green(`[SUCCESS]： ${str}`)
 }
 
 // 报错日志
 export const getLogError = (str: string | unknown = '') => {
-  return chalk.red(`[ERROR]： ${str}`)
+  return kleur.red(`[ERROR]： ${str}`)
 }
 
 // 计时日志
@@ -124,9 +124,9 @@ export const logTiming = ({
 } = {}) => {
   if (start) {
     console.time('Timing')
-    console.log(chalk.magenta(`****** ${str} START ******`))
+    console.log(kleur.magenta(`****** ${str} START ******`))
   } else {
-    console.log(chalk.magenta(`****** ${str} END ******`))
+    console.log(kleur.magenta(`****** ${str} END ******`))
     console.timeEnd('Timing')
   }
 }

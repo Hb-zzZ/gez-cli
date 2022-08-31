@@ -1,9 +1,9 @@
 import fs from 'fs-extra'
 import os from 'os'
-import { logError, logSuccess, logInfo } from '@/utils/log'
+import { logError, logInfo } from '@/utils/log'
 
 // 定义存放文件夹
-export const FILE_DIR: string = '.gez'
+export const FILE_DIR: string = `${os.homedir()}/.gez`
 
 interface IReadFile {
   path: string
@@ -15,6 +15,12 @@ interface IExistsFile {
   system?: boolean
 }
 
+interface ICopySystemFile {
+  path: string
+  copyPath: string
+  system?: boolean
+}
+
 interface IWriteFile {
   path: string
   file?: object
@@ -22,7 +28,7 @@ interface IWriteFile {
 }
 
 export const readFile = <T = {}>({ path = '', system = true }: IReadFile): T | false => {
-  const rePath = system ? `${os.homedir()}/${FILE_DIR}/${path}` : path
+  const rePath = system ? `${FILE_DIR}/${path}` : path
 
   try {
     if (!fs.pathExistsSync(rePath)) {
@@ -37,13 +43,17 @@ export const readFile = <T = {}>({ path = '', system = true }: IReadFile): T | f
 }
 
 export const existsFile = ({ path = '', system = true }: IExistsFile) => {
-  const rePath = system ? `${os.homedir()}/${FILE_DIR}/${path}` : path
+  const rePath = system ? `${FILE_DIR}/${path}` : path
   return fs.pathExistsSync(rePath)
 }
 
+export const copyFile = ({ path = '', copyPath = '', system = true }: ICopySystemFile) => {
+  const rePath = system ? `${FILE_DIR}/${path}` : path
+  return fs.copy(rePath, copyPath)
+}
+
 export const writeFile = ({ path = '', file, system = true }: IWriteFile) => {
-  const rePath = system ? `${os.homedir()}/${FILE_DIR}/${path}` : path
-  logInfo(rePath)
+  const rePath = system ? `${FILE_DIR}/${path}` : path
   try {
     fs.outputJsonSync(`${rePath}`, file)
   } catch (err) {

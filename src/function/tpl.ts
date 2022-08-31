@@ -1,35 +1,35 @@
-import { logError, logSuccess } from '@/utils/log'
+import { logError, logSuccess, logLoading } from '@/utils/log'
 import { downloadGit } from '@/utils/git'
+import { exec } from '@/utils/shell'
 import { writeFile, readFile } from '@/utils/file'
 import { checkControl } from '@/utils/tpl'
 import { getTpl, ITpl } from '@/config/tpl'
-import childProcess from 'child_process'
-import prompts from 'prompts'
-
-const commonInstructions: string = `
-
-↑/↓: 选择
-←/→/[空格]: 切换选择
-a: 全选
-回车: 确认
-
-`
+import { prompt } from '@/utils/prompt'
 
 //登录工蜂账号
 export const loginGit = async () => {
   try {
-    childProcess.exec('start https://git.code.tencent.com/profile/account')
-
-    const onSubmit = async (prompt: {}, answer: { TOKEN: string }) => {
-      writeFile({
-        path: '.gitConfig',
-        file: {
-          TOKEN: answer
-        }
-      })
+    // 打开失败不影响输入
+    try {
+      await exec('start https://git.code.tencent.com/profile/account')
+    } catch {
+      logError(`打开浏览器失败，请手动登录工蜂(https://git.code.tencent.com/profile/account)`)
     }
 
-    const response = await prompts(
+    const onSubmit = async (prompt: {}, answer: { TOKEN: string }) => {
+      try {
+        writeFile({
+          path: '.gitConfig',
+          file: {
+            TOKEN: answer
+          }
+        })
+
+        logSuccess(`写入成功`)
+      } catch {}
+    }
+
+    const response = await prompt(
       [
         {
           type: 'password',
@@ -62,6 +62,7 @@ export const selectTpl = async () => {
 
     if (gitConfig && gitConfig.TOKEN) {
       const onSubmit = async (prompt: {}, answer: []) => {
+        logLoading()
         const result = (await getTplList(answer)) as ITpl[] | undefined
 
         if (result) {
@@ -76,12 +77,14 @@ export const selectTpl = async () => {
             .then(() => {
               logSuccess(`模版${result.map(({ name }) => name)}下载成功`)
             })
+            .finally(() => logLoading({ start: false }))
         } else {
           logError(`获取模版错误`)
+          logLoading({ start: false })
         }
       }
 
-      const response = await prompts(
+      const response = await prompt(
         [
           {
             type: 'multiselect',
@@ -90,8 +93,7 @@ export const selectTpl = async () => {
             choices: [
               { title: 'element PC端', value: 'pc' },
               { title: 'vant 移动端', value: 'mobile' }
-            ],
-            instructions: commonInstructions
+            ]
           }
         ],
         { onSubmit }

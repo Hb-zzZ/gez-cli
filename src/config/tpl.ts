@@ -14,6 +14,11 @@ const SYSTEM_TPL: ISYSTEM_TPL = {
     downloadId: '223881',
     desc: 'gez-template控制器'
   },
+  package: {
+    name: 'package',
+    downloadId: '224415',
+    desc: 'package应用包'
+  },
   pc: {
     name: 'pc',
     downloadId: '222444',
