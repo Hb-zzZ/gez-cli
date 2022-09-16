@@ -1,6 +1,8 @@
 import fs from 'fs-extra'
 import os from 'os'
-import { logError, logInfo } from '@/utils/log'
+import nPath from 'path'
+import { logError } from '@/utils/log'
+import { eachFileFilterSync } from 'rd'
 
 // 定义存放文件夹
 export const FILE_DIR: string = `${os.homedir()}/.gez`
@@ -27,7 +29,12 @@ interface IWriteFile {
   system?: boolean
 }
 
-export const readFile = <T = {}>({ path = '', system = true }: IReadFile): T | false => {
+export interface IWalkFiles {
+  path: string
+  callback: (filePath: string, dirent: { [propName: string]: any }) => Promise<void>
+}
+
+export const readFile = <T = { [propName: string]: any }>({ path = '', system = true }: IReadFile): T | false => {
   const rePath = system ? `${FILE_DIR}/${path}` : path
 
   try {
@@ -49,7 +56,9 @@ export const existsFile = ({ path = '', system = true }: IExistsFile) => {
 
 export const copyFile = ({ path = '', copyPath = '', system = true }: ICopySystemFile) => {
   const rePath = system ? `${FILE_DIR}/${path}` : path
-  return fs.copy(rePath, copyPath)
+  // 复制之前清除旧路径
+  fs.removeSync(copyPath)
+  return fs.copySync(rePath, copyPath)
 }
 
 export const writeFile = ({ path = '', file, system = true }: IWriteFile) => {
@@ -59,4 +68,24 @@ export const writeFile = ({ path = '', file, system = true }: IWriteFile) => {
   } catch (err) {
     logError(`写入错误: ${err}`)
   }
+}
+
+// 遍历文件夹
+export const walkFiles = ({ path, callback }: IWalkFiles) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const allWalk: Promise<void>[] = []
+
+      eachFileFilterSync(nPath.resolve(path), /\.hbs$/, function (f, s) {
+        allWalk.push(Promise.resolve(callback(f, s)))
+      })
+
+      Promise.all(allWalk)
+        .then(() => resolve(null))
+        .catch((err) => reject(err))
+    } catch (error) {
+      logError(error)
+      reject(error)
+    }
+  })
 }

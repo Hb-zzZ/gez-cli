@@ -16,7 +16,7 @@ export const loginGit = async () => {
       logError(`打开浏览器失败，请手动登录工蜂(https://git.code.tencent.com/profile/account)`)
     }
 
-    const onSubmit = async (prompt: {}, answer: { TOKEN: string }) => {
+    const onSubmit = async (prompt: {}, answer: string) => {
       try {
         writeFile({
           path: '.gitConfig',
@@ -25,7 +25,7 @@ export const loginGit = async () => {
           }
         })
 
-        logSuccess(`写入成功`)
+        logSuccess(`写入成功，请确保私人令牌正确，如不正确请再次执行此命令`)
       } catch {}
     }
 
@@ -75,7 +75,7 @@ export const selectTpl = async () => {
               )
             )
             .then(() => {
-              logSuccess(`模版${result.map(({ name }) => name)}下载成功`)
+              logSuccess(`模版下载成功：\n${result.map(({ name }) => `-packages/${name}\n`)}`)
             })
             .finally(() => logLoading({ start: false }))
         } else {

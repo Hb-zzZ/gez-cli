@@ -24,24 +24,26 @@ interface IQuestions {
   message: string
   choices?: TChoices[]
   instructions?: string
+  hint?: string,
+  initial?: boolean
 }
 
-type TOnSubmit = (prompt: object, answer: any, answers: any[]) => void
+type TOnSubmit = (prompt: { [propName: string]: any }, answer: any, answers: any[]) => void
 type TOnCancel = () => void
 
 interface IOptions {
-  onSubmit: TOnSubmit
+  onSubmit?: TOnSubmit
   onCancel?: TOnCancel
 }
 
-export const prompt = (questions: IQuestions[], options: IOptions) => {
+export const prompt = (questions: IQuestions[], options?: IOptions) => {
   // 处理字体颜色
   questions.forEach((question) => {
     if (question.message) {
       question.message = kleur.magenta().bold(question.message)
     }
 
-    if (question.choices) {
+    if (question.type === 'multiselect') {
       // 添加自定义详细说明
       question.instructions = `
 
@@ -50,6 +52,19 @@ ${kleur.cyan(
     `↑/↓: 选择
 ←/→/[空格]: 切换选择
 a: 全选
+回车: 确认`
+)}
+            
+            `
+    }
+
+    if (question.type === 'select') {
+      // 添加自定义详细说明
+      question.hint = `
+
+${kleur.cyan(
+  question.hint ||
+    `↑/↓: 选择
 回车: 确认`
 )}
             

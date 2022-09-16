@@ -2,12 +2,13 @@ import { getCwdPath } from '@/utils/path'
 import { FILE_DIR, writeFile, readFile, copyFile, existsFile } from '@/utils/file'
 import axios from 'axios'
 import AdmZip from 'adm-zip'
-import { logError } from './log'
 
 export interface IDownloadGIt {
   downloadId: string
   path: string
   TOKEN: string
+  // 仅缓存
+  onlyCache?: boolean
 }
 
 export interface ICheckGit {
@@ -66,7 +67,7 @@ export const checkGit = async ({ downloadId, TOKEN, cachePath }: ICheckGit) => {
 }
 
 // https://code.tencent.com/help/api/repository
-export const downloadGit = ({ downloadId, TOKEN, path }: IDownloadGIt) => {
+export const downloadGit = ({ downloadId, TOKEN, path, onlyCache = false }: IDownloadGIt) => {
   return new Promise<string>((resolve, reject) => {
     const cachePath = `${FILE_DIR}/${path}`
 
@@ -76,8 +77,7 @@ export const downloadGit = ({ downloadId, TOKEN, path }: IDownloadGIt) => {
 
         if (lastConfig.cachePath) {
           // 存在缓存且可用
-          logError('Chach')
-          copyFile({ path: cachePath, copyPath: userPath, system: false })
+          !onlyCache && copyFile({ path: cachePath, copyPath: userPath, system: false })
         } else {
           axios({
             url: `http://git.code.tencent.com/api/v3/projects/${downloadId}/repository/archive`,
@@ -103,7 +103,7 @@ export const downloadGit = ({ downloadId, TOKEN, path }: IDownloadGIt) => {
                 }
               })
 
-              copyFile({ path: cachePath, copyPath: userPath, system: false })
+              !onlyCache && copyFile({ path: cachePath, copyPath: userPath, system: false })
 
               resolve(userPath)
             })

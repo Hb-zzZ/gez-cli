@@ -69,7 +69,10 @@ export const logLoading = ({
     spinnerLoading = false
     // 删除一个回车符，保持高度一致
     spinner.text = spinner.text.slice(1)
-    spinner.stopAndPersist({ text: str, prefixText: kleur.magenta(`******  DONE ******`) + `\n` })
+    spinner.stopAndPersist({
+      text: str ? `\n${kleur.magenta(str)}\n` : str,
+      prefixText: kleur.magenta(`******  DONE ******`) + `\n`
+    })
     spinner.text = ''
   }
 }
