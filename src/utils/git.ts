@@ -1,5 +1,5 @@
 import { getCwdPath } from '@/utils/path'
-import { FILE_DIR, writeFile, readFile, copyFile, existsFile } from '@/utils/file'
+import { FILE_DIR, writeFile, readFile, copyFile, existsFile, removeFile } from '@/utils/file'
 import axios from 'axios'
 import AdmZip from 'adm-zip'
 
@@ -88,6 +88,7 @@ export const downloadGit = ({ downloadId, TOKEN, path, onlyCache = false }: IDow
             responseType: 'arraybuffer'
           })
             .then(async (res: { data: Buffer }) => {
+              removeFile({ path: cachePath, system: false })
               const zip = new AdmZip(res.data)
 
               await zip.extractAllTo(cachePath, true)

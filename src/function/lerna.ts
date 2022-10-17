@@ -1,6 +1,6 @@
 import { logError, logSuccess, logLoading } from '@/utils/log'
 import { downloadGit } from '@/utils/git'
-import { copyFile, readFile, existsFile } from '@/utils/file'
+import { copyFile, readFile, existsFile, removeFile } from '@/utils/file'
 import { prompt } from '@/utils/prompt'
 import { getTpl } from '@/config/tpl'
 import { preCompiler } from '@/utils/preCompiler'
@@ -68,10 +68,11 @@ export const createPkg = async () => {
         }
 
         if (isCreate) {
+          removeFile({ path: createPath, system: false })
           // 将选择的pck从缓存中复制
           copyFile({ path: packagePath, copyPath: createPath })
 
-          preCompiler(createPath)
+          await preCompiler(createPath, { pkg: 'pkName', name: '测试' })
 
           logSuccess(`创建包成功：\n-${createPath}`)
         }

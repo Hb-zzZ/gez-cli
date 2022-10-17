@@ -12,6 +12,11 @@ interface IReadFile {
   system?: boolean
 }
 
+interface IRemoveFile {
+  path: string
+  system?: boolean
+}
+
 interface IExistsFile {
   path: string
   system?: boolean
@@ -47,6 +52,11 @@ export const readFile = <T = { [propName: string]: any }>({ path = '', system = 
     logError(`读取错误: ${rePath}`)
     return false
   }
+}
+
+export const removeFile = ({ path = '', system = true }: IRemoveFile) => {
+  const rePath = system ? `${FILE_DIR}/${path}` : path
+  return fs.removeSync(rePath)
 }
 
 export const existsFile = ({ path = '', system = true }: IExistsFile) => {
