@@ -46,6 +46,7 @@ export const readFile = <T = { [propName: string]: any }>({ path = '', system = 
     if (!fs.pathExistsSync(rePath)) {
       return false
     }
+    
     const data = fs.readJsonSync(rePath)
     return data
   } catch (err) {

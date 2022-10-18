@@ -1,5 +1,5 @@
 import { logError, logSuccess, logLoading } from '@/utils/log'
-import { downloadGit } from '@/utils/git'
+import { downloadGit, getCachePath } from '@/utils/git'
 import { copyFile, readFile, existsFile, removeFile } from '@/utils/file'
 import { prompt } from '@/utils/prompt'
 import { getTpl } from '@/config/tpl'
@@ -23,7 +23,12 @@ export const createPkg = async () => {
         onlyCache: true
       })
 
-      const packagesConfig = readFile({ path: `${PACKAGES_PATH}/.gez` }) || { packagesList: null }
+      const packagesConfigPath = getCachePath({ downloadId: packageTpl.downloadId, path: `${PACKAGES_PATH}/.gez.json` })
+
+      const packagesConfig = readFile({
+        path: packagesConfigPath,
+        system: false
+      }) || { packagesList: null }
 
       if (Array.isArray(packagesConfig.packagesList) && packagesConfig.packagesList.length) {
         logLoading({ start: false, str: '获取配置成功' })
@@ -45,7 +50,7 @@ export const createPkg = async () => {
         const { packageName, outputName: rOutputName } = response
         const outputName = rOutputName || packageName
 
-        const packagePath = `${PACKAGES_PATH}/${packageName}`
+        const packagePath = `${getCachePath({ downloadId: packageTpl.downloadId, path: PACKAGES_PATH })}/${packageName}`
         const createPath = `${PACKAGES_PATH}/${outputName}`
 
         let isCreate = true
@@ -70,7 +75,7 @@ export const createPkg = async () => {
         if (isCreate) {
           removeFile({ path: createPath, system: false })
           // 将选择的pck从缓存中复制
-          copyFile({ path: packagePath, copyPath: createPath })
+          copyFile({ path: packagePath, copyPath: createPath, system: false })
 
           await preCompiler(createPath, { pkg: 'pkName', name: '测试' })
 
@@ -79,12 +84,12 @@ export const createPkg = async () => {
 
         return response
       } else {
-        logLoading({ start: false })
+        logLoading({ start: false, str: '获取配置失败' })
 
         return false
       }
     } else {
-      logError(`请先执行[loginGit]获取用户信息`)
+      logError(`请先执行[logingit]获取用户信息`)
     }
   } catch (error) {
     logError(error)

@@ -5,7 +5,7 @@ import { readFile } from '@/utils/file'
 export const checkControl = (TOKEN: string) => {
   return new Promise<string>(async (resolve, reject) => {
     try {
-      const controlConfig: { name: string; version: string } | false = readFile({ path: '.gez', system: false })
+      const controlConfig: { name: string; version: string } | false = readFile({ path: '.gez.json', system: false })
 
       if (controlConfig && controlConfig.name === 'control') {
         resolve(controlConfig.version)

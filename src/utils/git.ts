@@ -3,6 +3,11 @@ import { FILE_DIR, writeFile, readFile, copyFile, existsFile, removeFile } from 
 import axios from 'axios'
 import AdmZip from 'adm-zip'
 
+export interface IGetCachePath {
+  downloadId: string
+  path: string
+}
+
 export interface IDownloadGIt {
   downloadId: string
   path: string
@@ -66,10 +71,14 @@ export const checkGit = async ({ downloadId, TOKEN, cachePath }: ICheckGit) => {
   })
 }
 
+export const getCachePath = ({ downloadId, path }: IGetCachePath) => {
+  return `${FILE_DIR}/download/${downloadId}/${path}`
+}
+
 // https://code.tencent.com/help/api/repository
 export const downloadGit = ({ downloadId, TOKEN, path, onlyCache = false }: IDownloadGIt) => {
   return new Promise<string>((resolve, reject) => {
-    const cachePath = `${FILE_DIR}/${path}`
+    const cachePath = getCachePath({ downloadId, path })
 
     checkGit({ downloadId, TOKEN, cachePath })
       .then(({ downloadGitConfig, lastConfig }) => {

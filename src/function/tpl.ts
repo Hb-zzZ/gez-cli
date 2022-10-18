@@ -65,7 +65,7 @@ export const selectTpl = async () => {
         logLoading()
         const result = (await getTplList(answer)) as ITpl[] | undefined
 
-        if (result) {
+        if (result && result.length) {
           checkControl(gitConfig.TOKEN)
             .then(() =>
               Promise.all(
@@ -101,7 +101,7 @@ export const selectTpl = async () => {
 
       return response
     } else {
-      logError(`请先执行[loginGit]获取用户信息`)
+      logError(`请先执行[logingit]获取用户信息`)
     }
   } catch (error) {
     logError(error)
