@@ -1,4 +1,4 @@
-import { selectTpl, loginGit } from '@/function/tpl'
+import { createTpl, loginGit } from '@/function/tpl'
 
 const commands = {
   logingit: {
@@ -9,7 +9,7 @@ const commands = {
   create: {
     description: '初始化脚手架模版',
     command: 'create',
-    action: () => selectTpl()
+    action: () => createTpl()
   }
 }
 

@@ -59,18 +59,20 @@ export const logLoading = ({
 }: {
   // 是否开启loading
   start?: boolean
-  str?: string
+  str?: string | unknown
 } = {}) => {
+  const text = typeof str === 'string' ? str : ''
+
   if (start) {
     spinnerLoading = true
-    spinner.text = '\n\n' + kleur.cyan(str)
+    spinner.text = '\n\n' + kleur.cyan(text)
     spinner.start()
   } else {
     spinnerLoading = false
     // 删除一个回车符，保持高度一致
     spinner.text = spinner.text.slice(1)
     spinner.stopAndPersist({
-      text: str ? `\n${kleur.magenta(str)}\n` : str,
+      text: text ? `\n${kleur.magenta(text)}\n` : text,
       prefixText: kleur.magenta(`******  DONE ******`) + `\n`
     })
     spinner.text = ''

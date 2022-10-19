@@ -1,7 +1,6 @@
 import { logError, logSuccess, logLoading } from '@/utils/log'
-import { downloadGit } from '@/utils/git'
 import { exec } from '@/utils/shell'
-import { writeFile, readFile } from '@/utils/file'
+import { writeFile } from '@/utils/file'
 import { checkControl } from '@/utils/tpl'
 import { getTpl, ITpl } from '@/config/tpl'
 import { prompt } from '@/utils/prompt'
@@ -22,7 +21,8 @@ export const loginGit = async () => {
           path: '.gitConfig',
           file: {
             TOKEN: answer
-          }
+          },
+          system: true
         })
 
         logSuccess(`写入成功，请确保私人令牌正确，如不正确请再次执行此命令`)
@@ -55,55 +55,18 @@ export const getTplList = async (list: string[] = []): Promise<ITpl[] | undefine
   }
 }
 
-// 选择模板初始化或更新下载
-export const selectTpl = async () => {
+// 模板初始化
+export const createTpl = async () => {
   try {
-    const gitConfig: { TOKEN: string } | false = readFile({ path: '.gitConfig' })
+    logLoading()
 
-    if (gitConfig && gitConfig.TOKEN) {
-      const onSubmit = async (prompt: {}, answer: []) => {
-        logLoading()
-        const result = (await getTplList(answer)) as ITpl[] | undefined
-
-        if (result && result.length) {
-          checkControl(gitConfig.TOKEN)
-            .then(() =>
-              Promise.all(
-                result.map(({ downloadId, name }) =>
-                  downloadGit({ downloadId, TOKEN: gitConfig.TOKEN, path: `packages/${name}` })
-                )
-              )
-            )
-            .then(() => {
-              logSuccess(`模版下载成功：\n${result.map(({ name }) => `-packages/${name}\n`)}`)
-            })
-            .finally(() => logLoading({ start: false }))
-        } else {
-          logError(`获取模版错误`)
-          logLoading({ start: false })
-        }
-      }
-
-      const response = await prompt(
-        [
-          {
-            type: 'multiselect',
-            name: 'tplName',
-            message: '请选择要拉取的模版',
-            choices: [
-              { title: 'element PC端', value: 'pc' },
-              { title: 'vant 移动端', value: 'mobile' }
-            ]
-          }
-        ],
-        { onSubmit }
-      )
-
-      return response
-    } else {
-      logError(`请先执行[logingit]获取用户信息`)
-    }
+    await checkControl()
+      .then(() => {
+        logSuccess(`模版初始化成功`)
+      })
+      .finally(() => logLoading({ start: false }))
   } catch (error) {
+    logLoading({ start: false })
     logError(error)
   }
 }

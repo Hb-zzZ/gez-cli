@@ -2,20 +2,46 @@ import { downloadGit } from '@/utils/git'
 import { getTpl } from '@/config/tpl'
 import { readFile } from '@/utils/file'
 
-export const checkControl = (TOKEN: string) => {
-  return new Promise<string>(async (resolve, reject) => {
-    try {
-      const controlConfig: { name: string; version: string } | false = readFile({ path: '.gez.json', system: false })
+interface IControl {
+  version: string
+  lastVersion: string
+}
 
-      if (controlConfig && controlConfig.name === 'control') {
-        resolve(controlConfig.version)
+export const checkControl = () => {
+  return new Promise<IControl>(async (resolve, reject) => {
+    try {
+      const getConfig = () => {
+        const config: { name: string; version: string } | false = readFile({ path: '.gez.json', cache: false })
+
+        if (config && config.name === 'control') {
+          return {
+            version: config.version,
+            lastVersion: config.version
+          }
+        } else {
+          return false
+        }
+      }
+
+      const config = getConfig()
+
+      if (config) {
+        resolve(config)
       } else {
         const controlTpl = getTpl('control')
 
-        await downloadGit({ downloadId: controlTpl.downloadId, TOKEN, path: `` })
-        resolve(controlTpl.name)
+        await downloadGit({ downloadId: controlTpl.downloadId, path: `` })
+
+        const config = getConfig()
+        
+        if (config) {
+          resolve(config)
+        } else {
+          reject(`获取ControlConfig失败`)
+        }
       }
     } catch (error) {
+      console.log(JSON.stringify(error))
       reject(error)
     }
   })

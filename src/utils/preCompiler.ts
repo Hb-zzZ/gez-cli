@@ -35,7 +35,7 @@ export const preCompiler = (path: string, data: { [propName: string]: any }) => 
       // 编译模版
       await templatePlop.runActions(data)
       // 删除模版
-      hbsList.forEach((templatePath) => removeFile({ path: templatePath, system: false }))
+      hbsList.forEach((templatePath) => removeFile({ path: templatePath }))
 
       resolve(null)
     } catch (error) {
