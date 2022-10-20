@@ -1,12 +1,10 @@
 import { logError, logSuccess, logLoading } from '@/utils/log'
-import { downloadGit, getCachePath } from '@/utils/git'
+import { downloadGit } from '@/utils/git'
 import { copyFile, readFile, existsFile, removeFile } from '@/utils/file'
 import { prompt } from '@/utils/prompt'
-import { getTpl } from '@/config/tpl'
-import { checkControl } from '@/utils/tpl'
+import { getTpl, PACKAGES_PATH } from '@/config/tpl'
+import { checkControl, checkTemplate } from '@/utils/tpl'
 import { preCompiler } from '@/utils/preCompiler'
-
-const PACKAGES_PATH = `packages`
 
 // 选择模板初始化或更新下载
 export const createPkg = async () => {
@@ -24,12 +22,18 @@ export const createPkg = async () => {
 
     if (packagesConfig && Array.isArray(packagesConfig.packagesList) && packagesConfig.packagesList.length) {
       logLoading({ start: false, str: '获取配置成功' })
+      const packagesList = packagesConfig.packagesList
 
       const response = await prompt([
         {
           type: 'text',
           name: 'outputName',
-          message: '请输入应用包名称'
+          message: '请输入输出目录名称'
+        },
+        {
+          type: 'text',
+          name: 'projectTitle',
+          message: '请输入项目标题'
         },
         {
           type: 'select',
@@ -39,7 +43,7 @@ export const createPkg = async () => {
         }
       ])
 
-      const { packageName, outputName: rOutputName } = response
+      const { packageName, outputName: rOutputName, projectTitle } = response
       const outputName = rOutputName || packageName
 
       const packagePath = `${cachePath}/${packageName}`
@@ -65,14 +69,20 @@ export const createPkg = async () => {
       }
 
       if (isCreate) {
+        const { template } = packagesList.find((item) => item.value === packageName)
+
         // 确保初始化control
         await checkControl()
+        // 确保存在模版包
+        await checkTemplate(template)
 
         removeFile({ path: createPath })
         // 将选择的pck从缓存中复制
         copyFile({ path: packagePath, copyPath: createPath })
 
-        await preCompiler(createPath, { pkg: 'pkName', name: outputName })
+        const compilerParams = { packageName: outputName, packageValue: packageName, projectTitle }
+
+        await preCompiler(createPath, compilerParams)
 
         logSuccess(`创建包成功：\n-${createPath}`)
       }

@@ -1,4 +1,4 @@
-import { createTpl, loginGit } from '@/function/tpl'
+import { updateTpl, loginGit } from '@/function/tpl'
 
 const commands = {
   logingit: {
@@ -6,10 +6,10 @@ const commands = {
     command: 'logingit',
     action: () => loginGit()
   },
-  create: {
-    description: '初始化脚手架模版',
-    command: 'create',
-    action: () => createTpl()
+  update: {
+    description: '自动更新脚手架模版',
+    command: 'update',
+    action: () => updateTpl()
   }
 }
 

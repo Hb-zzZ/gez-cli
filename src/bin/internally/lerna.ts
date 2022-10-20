@@ -3,6 +3,11 @@ import { TOption } from '@/bin/index'
 import { createPkg } from '@/function/lerna'
 
 const commands = {
+  create: {
+    description: '仓库创建package应用包',
+    command: 'create',
+    action: () => createPkg()
+  },
   install: {
     description: '仓库安装所有第三方依赖包',
     command: 'install',
@@ -19,11 +24,6 @@ const commands = {
         exec(`lerna add ${name}`)
       }
     }
-  },
-  createpkg: {
-    description: '仓库创建package应用包',
-    command: 'createpkg',
-    action: () => createPkg()
   }
 }
 

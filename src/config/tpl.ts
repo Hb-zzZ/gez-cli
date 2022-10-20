@@ -19,8 +19,8 @@ const SYSTEM_TPL: ISYSTEM_TPL = {
     downloadId: '224415',
     desc: 'packages应用包'
   },
-  pc: {
-    name: 'pc',
+  gezPc: {
+    name: 'gezPc',
     downloadId: '222444',
     desc: 'pc端模版 element-ui vue@2.0'
   }
@@ -29,3 +29,5 @@ const SYSTEM_TPL: ISYSTEM_TPL = {
 export const getTpl = (name: string): ITpl => {
   return SYSTEM_TPL[name]
 }
+
+export const PACKAGES_PATH = `packages`

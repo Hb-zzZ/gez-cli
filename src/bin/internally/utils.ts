@@ -7,9 +7,9 @@ const commands = {
     command: 'check',
     action: () => checkVersion()
   },
-  gitcz: {
+  gitcommit: {
     description: 'git规范提交',
-    command: 'gitcz',
+    command: 'gitcommit',
     action: async () => {
       try {
         await exec(`git cz`)

@@ -1,8 +1,7 @@
 import { logError, logSuccess, logLoading } from '@/utils/log'
 import { exec } from '@/utils/shell'
 import { writeFile } from '@/utils/file'
-import { checkControl } from '@/utils/tpl'
-import { getTpl, ITpl } from '@/config/tpl'
+import { updateAllTpl } from '@/utils/tpl'
 import { prompt } from '@/utils/prompt'
 
 //登录工蜂账号
@@ -46,27 +45,11 @@ export const loginGit = async () => {
   }
 }
 
-// 获取所有模版对应地址
-export const getTplList = async (list: string[] = []): Promise<ITpl[] | undefined> => {
+// 更新所有模板
+export const updateTpl = async () => {
   try {
-    return Promise.all(list.map((name) => getTpl(name)))
+    await updateAllTpl()
   } catch (error) {
-    logError(error)
-  }
-}
-
-// 模板初始化
-export const createTpl = async () => {
-  try {
-    logLoading()
-
-    await checkControl()
-      .then(() => {
-        logSuccess(`模版初始化成功`)
-      })
-      .finally(() => logLoading({ start: false }))
-  } catch (error) {
-    logLoading({ start: false })
     logError(error)
   }
 }
